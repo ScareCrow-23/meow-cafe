@@ -1,14 +1,28 @@
 "use client";
 import React, { useState } from "react";
 import HeroSection from "./components/Hero";
-import MenuNavigation from "./components/MenuNavigation";
 import MenuItems from "./components/MenuItems";
 import OrderSummary from "./components/OrderSummary";
 
-export default function MenuPage() {
-  const [cart, setCart] = useState<any[]>([]);
+// Define a type for menu items
+export interface MenuItem {
+  _id: string;
+  name: string;
+  description?: string;
+  price: number;
+  image?: string;
+  category: string;
+}
 
-  const handleAddToCart = (item: any) => {
+// Extend menu item for cart
+export interface CartItem extends MenuItem {
+  quantity: number;
+}
+
+export default function MenuPage() {
+  const [cart, setCart] = useState<CartItem[]>([]);
+
+  const handleAddToCart = (item: MenuItem) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find(
         (cartItem) => cartItem._id === item._id
@@ -39,9 +53,7 @@ export default function MenuPage() {
   return (
     <>
       <HeroSection />
-      {/* <MenuNavigation /> */}
 
-      {/* Two-column layout: Menu + Order summary */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Menu section */}
         <div className="lg:col-span-2">

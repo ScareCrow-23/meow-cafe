@@ -1,14 +1,24 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
-export default function MenuItems({
-  onAddToCart,
-}: {
-  onAddToCart: (item: any) => void;
-}) {
-  const [menuItems, setMenuItems] = useState<any[]>([]);
+// Define a type for menu items
+interface MenuItem {
+  _id: string;
+  name: string;
+  description?: string;
+  price: number;
+  category: string;
+  image?: string;
+}
+
+interface MenuItemsProps {
+  onAddToCart: (item: MenuItem) => void;
+}
+
+export default function MenuItems({ onAddToCart }: MenuItemsProps) {
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string>("");
 
   // Fetch menu items from backend
   useEffect(() => {
@@ -16,10 +26,14 @@ export default function MenuItems({
       try {
         const res = await fetch("/api/menu");
         if (!res.ok) throw new Error("Failed to fetch menu items");
-        const data = await res.json();
+        const data: { success: boolean; data: MenuItem[] } = await res.json();
         setMenuItems(data.data);
-      } catch (err: any) {
-        setError(err.message || "Something went wrong");
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Something went wrong");
+        }
       } finally {
         setLoading(false);
       }
