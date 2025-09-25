@@ -29,12 +29,25 @@ interface MenuItem {
   image?: string;
 }
 
+interface MenuApiResponse {
+  success: boolean;
+  data?: MenuItem[];
+  error?: string;
+}
+
+interface AddMenuApiResponse {
+  success: boolean;
+  data?: MenuItem;
+  error?: string;
+}
+
 export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [open, setOpen] = useState<boolean>(false);
+  const [uploading, setUploading] = useState<boolean>(false);
 
-  // Form state for new menu item
+  // Form state
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -46,15 +59,14 @@ export default function MenuPage() {
   // File upload state
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
 
-  // Fetch all menu items
+  // Fetch menu items
   const fetchMenu = async () => {
     try {
       setLoading(true);
       const res = await fetch("/api/menu");
-      const data = await res.json();
-      if (data.success) {
+      const data: MenuApiResponse = await res.json();
+      if (data.success && data.data) {
         setMenuItems(data.data);
       }
     } catch (err) {
@@ -68,48 +80,65 @@ export default function MenuPage() {
     fetchMenu();
   }, []);
 
-  // Handle input change
+  // Handle form input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   // Handle file selection
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0] ?? null;
-    setFile(f);
-    setPreview(f ? URL.createObjectURL(f) : null);
+    const selectedFile = e.target.files?.[0] ?? null;
+    setFile(selectedFile);
+    setPreview(selectedFile ? URL.createObjectURL(selectedFile) : null);
   };
 
-  // Upload image to server route
-  async function uploadImage(): Promise<string | null> {
-    if (!file) return null;
+  // Upload image to Cloudinary via API
+  const uploadImage = async (): Promise<string> => {
+    if (!file) throw new Error("No file selected");
+
     setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/menu/upload", { method: "POST", body: fd });
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("/api/menu/upload", {
+      method: "POST",
+      body: formData,
+    });
     const json = await res.json();
+
     setUploading(false);
-    if (!res.ok) throw new Error(json.error || "Upload failed");
+
+    if (!res.ok) {
+      throw new Error(json.error || "Image upload failed");
+    }
+
     return json.url as string;
-  }
+  };
 
   // Add new menu item
   const handleAddMenuItem = async () => {
     try {
-      let imageUrl = form.image; // accept URL if entered manually
+      let imageUrl: string = form.image;
+
       if (file && !imageUrl) {
         imageUrl = await uploadImage();
       }
 
-      const payload = { ...form, price: Number(form.price), image: imageUrl };
+      const payload = {
+        ...form,
+        price: Number(form.price),
+        image: imageUrl,
+      };
+
       const res = await fetch("/api/menu", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
-      if (data.success) {
+      const data: AddMenuApiResponse = await res.json();
+
+      if (data.success && data.data) {
         setMenuItems([...menuItems, data.data]);
         setForm({
           name: "",
@@ -126,11 +155,13 @@ export default function MenuPage() {
       }
     } catch (err) {
       console.error("Error adding menu item:", err);
+      alert(err instanceof Error ? err.message : "Unknown error occurred");
     }
   };
 
   return (
     <Box sx={{ p: 4 }}>
+      {/* Header */}
       <Box
         display="flex"
         justifyContent="space-between"
@@ -149,6 +180,7 @@ export default function MenuPage() {
         </Button>
       </Box>
 
+      {/* Menu Table */}
       {loading ? (
         <CircularProgress />
       ) : (
@@ -226,7 +258,7 @@ export default function MenuPage() {
               fullWidth
             />
 
-            {/* File upload input */}
+            {/* File Upload */}
             <Button variant="outlined" component="label">
               Upload Image
               <input

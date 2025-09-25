@@ -125,7 +125,7 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-primary/20 mt-8 py-4 text-center text-sm text-muted">
-        © {new Date().getFullYear()} Yoube’s Café & More. All rights reserved.
+        © {new Date().getFullYear()} The Daily Grind. All rights reserved.
       </div>
     </footer>
   );

@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import React, { useState, useEffect } from "react";
 
 // Define a type for menu items
@@ -83,12 +84,14 @@ export default function MenuItems({ onAddToCart }: MenuItemsProps) {
                 >
                   {/* Image */}
                   <div className="relative">
-                    <img
+                    <Image
                       src={
                         item.image ||
                         "https://placehold.co/600x400/171717/ededed?text=No+Image"
                       }
                       alt={item.name}
+                      width={600} // match the placeholder dimensions
+                      height={400}
                       className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>

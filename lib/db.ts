@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { ConnectOptions, Mongoose } from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -8,21 +8,25 @@ if (!MONGODB_URI) {
   );
 }
 
-// Global variable to cache the connection
-// The type is now correctly inferred from the global declaration
-let cached = global.mongoose;
-
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+// Extend NodeJS global type
+declare global {
+  var mongoose: {
+    conn: Mongoose | null;
+    promise: Promise<Mongoose> | null;
+  };
 }
 
-async function dbConnect() {
+// Initialize global.mongoose if it doesn't exist
+const cached = global.mongoose || { conn: null, promise: null };
+global.mongoose = cached;
+
+async function dbConnect(): Promise<Mongoose> {
   if (cached.conn) {
     return cached.conn;
   }
 
   if (!cached.promise) {
-    const opts = {
+    const opts: ConnectOptions = {
       bufferCommands: false,
     };
 
@@ -32,7 +36,7 @@ async function dbConnect() {
   try {
     cached.conn = await cached.promise;
   } catch (e) {
-    cached.promise = null; // Reset promise on connection failure
+    cached.promise = null; // Reset promise on failure
     throw e;
   }
 

@@ -1,12 +1,35 @@
 "use client";
 import React, { useState } from "react";
 
+interface CartItem {
+  _id?: string;
+  id?: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+interface OrderSummaryProps {
+  cart: CartItem[];
+  onUpdateQuantity: (id: string, quantity: number) => void;
+  onRemoveItem: (id: string) => void;
+}
+
+interface FormData {
+  name: string;
+  email: string;
+  contactNumber: string;
+  deliveryMethod: "Dine-in" | "Delivery";
+  tableNumber: string;
+  deliveryAddress: string;
+}
+
 export default function OrderSummary({
   cart = [],
   onUpdateQuantity,
   onRemoveItem,
-}) {
-  const [formData, setFormData] = useState({
+}: OrderSummaryProps) {
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
     contactNumber: "",
@@ -78,52 +101,55 @@ export default function OrderSummary({
           <>
             {/* Cart Items */}
             <ul className="divide-y divide-gray-700">
-              {cart.map((item) => (
-                <li
-                  key={item._id || item.id}
-                  className="py-4 flex items-center justify-between"
-                >
-                  <div className="flex-1 flex flex-col">
-                    <p className="text-lg font-semibold text-foreground">
-                      {item.name}
-                    </p>
-                    <p className="text-sm text-muted">
-                      ${item.price.toFixed(2)}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center space-x-2">
+              {cart.map((item) => {
+                const itemId = item._id || item.id!;
+                return (
+                  <li
+                    key={itemId}
+                    className="py-4 flex items-center justify-between"
+                  >
+                    <div className="flex-1 flex flex-col">
+                      <p className="text-lg font-semibold text-foreground">
+                        {item.name}
+                      </p>
+                      <p className="text-sm text-muted">
+                        ${item.price.toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() =>
+                            onUpdateQuantity(itemId, item.quantity - 1)
+                          }
+                          className="bg-primary/20 hover:bg-primary/50 text-foreground w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200"
+                          disabled={item.quantity <= 1}
+                        >
+                          -
+                        </button>
+                        <span className="text-lg text-foreground font-medium">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() =>
+                            onUpdateQuantity(itemId, item.quantity + 1)
+                          }
+                          className="bg-primary/20 hover:bg-primary/50 text-foreground w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200"
+                        >
+                          +
+                        </button>
+                      </div>
                       <button
-                        onClick={() =>
-                          onUpdateQuantity(item.id, item.quantity - 1)
-                        }
-                        className="bg-primary/20 hover:bg-primary/50 text-foreground w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200"
-                        disabled={item.quantity <= 1}
+                        onClick={() => onRemoveItem(itemId)}
+                        className="text-red-400 hover:text-red-300 transition-colors duration-200"
+                        aria-label={`Remove ${item.name}`}
                       >
-                        -
-                      </button>
-                      <span className="text-lg text-foreground font-medium">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() =>
-                          onUpdateQuantity(item.id, item.quantity + 1)
-                        }
-                        className="bg-primary/20 hover:bg-primary/50 text-foreground w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200"
-                      >
-                        +
+                        ✕
                       </button>
                     </div>
-                    <button
-                      onClick={() => onRemoveItem(item.id)}
-                      className="text-red-400 hover:text-red-300 transition-colors duration-200"
-                      aria-label={`Remove ${item.name}`}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
 
             {/* Subtotal */}

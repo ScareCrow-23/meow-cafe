@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 
 const testimonials = [
@@ -41,10 +42,12 @@ export default function Testimonials() {
 
             {/* Content */}
             <div className="relative flex flex-col items-center">
-              <img
+              <Image
                 src={testimonial.image}
                 alt={`Profile of ${testimonial.name}`}
-                className="w-20 h-20 rounded-full mb-6 object-cover border-4 border-primary shadow-md"
+                width={80} // 20 * 4px (Tailwind default scale) → adjust as needed
+                height={80}
+                className="rounded-full mb-6 object-cover border-4 border-primary shadow-md"
               />
               <p className="text-muted text-lg leading-relaxed mb-6 italic">
                 {testimonial.quote}

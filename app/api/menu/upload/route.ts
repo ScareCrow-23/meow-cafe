@@ -1,6 +1,6 @@
 // app/api/menu/upload/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
+import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 import streamifier from "streamifier";
 import { COOKIE_NAME, verifyAdminToken } from "@/lib/auth"; // adjust path to your lib/auth
 
@@ -40,12 +40,12 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
 
     // --- upload to Cloudinary ---
-    const result: any = await new Promise((resolve, reject) => {
+    const result: UploadApiResponse = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { folder: "menu" }, // optional folder
         (err, res) => {
           if (err) reject(err);
-          else resolve(res);
+          else resolve(res!);
         }
       );
       streamifier.createReadStream(buffer).pipe(uploadStream);
