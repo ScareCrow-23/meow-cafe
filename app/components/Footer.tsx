@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Facebook, Instagram, Phone, Mail, MapPin } from "lucide-react";
+import { Typography } from "@mui/material";
 
 export default function Footer() {
   return (
@@ -7,12 +8,18 @@ export default function Footer() {
       <div className="container mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Brand */}
         <div>
-          <Link
-            href="/"
-            className="text-3xl font-serif font-bold text-primary tracking-wide"
+          <Typography
+            variant="h5"
+            sx={{
+              color: "var(--foreground)",
+              fontWeight: 300,
+              letterSpacing: 6,
+              textTransform: "uppercase",
+              fontFamily: "inherit",
+            }}
           >
-            Yoube’s Café
-          </Link>
+            The Daily Grind
+          </Typography>
           <p className="text-muted mt-3 text-sm leading-relaxed">
             A cozy corner where coffee meets community. Crafted flavors,
             heartfelt service, and timeless ambience.
@@ -70,11 +77,11 @@ export default function Footer() {
               <Phone size={16} className="text-primary" /> +91 11-41729511
             </li>
             <li className="flex items-center gap-2">
-              <Mail size={16} className="text-primary" /> hello@youbescafe.com
+              <Mail size={16} className="text-primary" /> info@thedailygrind.com
             </li>
             <li className="flex items-start gap-2">
               <MapPin size={16} className="text-primary mt-1" />
-              <span>Yoube’s Café & More, New Delhi, India</span>
+              <span>The Daily Grind, Navi Mumbai</span>
             </li>
           </ul>
         </div>
