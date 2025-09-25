@@ -16,7 +16,6 @@ declare global {
   };
 }
 
-// Initialize global.mongoose if it doesn't exist
 const cached = global.mongoose || { conn: null, promise: null };
 global.mongoose = cached;
 
@@ -30,13 +29,14 @@ async function dbConnect(): Promise<Mongoose> {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts);
+    // Tell TypeScript that MONGODB_URI is definitely a string
+    cached.promise = mongoose.connect(MONGODB_URI as string, opts);
   }
 
   try {
     cached.conn = await cached.promise;
   } catch (e) {
-    cached.promise = null; // Reset promise on failure
+    cached.promise = null;
     throw e;
   }
 
