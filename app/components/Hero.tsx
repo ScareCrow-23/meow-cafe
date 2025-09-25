@@ -31,10 +31,7 @@ export default function HeroSection() {
           zIndex: 0,
         }}
       >
-        <source
-          src="https://assets.mixkit.co/videos/preview/mixkit-coffee-beans-in-slow-motion-2374-large.mp4"
-          type="video/mp4"
-        />
+        <source src="hero.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </Box>
 

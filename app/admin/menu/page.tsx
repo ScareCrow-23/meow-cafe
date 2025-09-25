@@ -43,6 +43,11 @@ export default function MenuPage() {
     image: "",
   });
 
+  // File upload state
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
   // Fetch all menu items
   const fetchMenu = async () => {
     try {
@@ -68,16 +73,39 @@ export default function MenuPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Handle file selection
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0] ?? null;
+    setFile(f);
+    setPreview(f ? URL.createObjectURL(f) : null);
+  };
+
+  // Upload image to server route
+  async function uploadImage(): Promise<string | null> {
+    if (!file) return null;
+    setUploading(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch("/api/menu/upload", { method: "POST", body: fd });
+    const json = await res.json();
+    setUploading(false);
+    if (!res.ok) throw new Error(json.error || "Upload failed");
+    return json.url as string;
+  }
+
   // Add new menu item
   const handleAddMenuItem = async () => {
     try {
+      let imageUrl = form.image; // accept URL if entered manually
+      if (file && !imageUrl) {
+        imageUrl = await uploadImage();
+      }
+
+      const payload = { ...form, price: Number(form.price), image: imageUrl };
       const res = await fetch("/api/menu", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          price: Number(form.price),
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -90,6 +118,8 @@ export default function MenuPage() {
           category: "",
           image: "",
         });
+        setFile(null);
+        setPreview(null);
         setOpen(false);
       } else {
         alert(data.error || "Failed to add menu item");
@@ -189,12 +219,38 @@ export default function MenuPage() {
               placeholder="Hot Coffee, Cold Coffee, Pastries, Sandwiches, Tea"
             />
             <TextField
-              label="Image URL"
+              label="Image URL (optional)"
               name="image"
               value={form.image}
               onChange={handleChange}
               fullWidth
             />
+
+            {/* File upload input */}
+            <Button variant="outlined" component="label">
+              Upload Image
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={onFileChange}
+              />
+            </Button>
+            {preview && (
+              <Box mt={1}>
+                <Typography variant="body2">Preview:</Typography>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={preview}
+                  alt="preview"
+                  style={{
+                    maxWidth: "100%",
+                    borderRadius: "8px",
+                    marginTop: "8px",
+                  }}
+                />
+              </Box>
+            )}
           </Box>
         </DialogContent>
         <DialogActions>
@@ -203,8 +259,9 @@ export default function MenuPage() {
             variant="contained"
             color="primary"
             onClick={handleAddMenuItem}
+            disabled={uploading}
           >
-            Add
+            {uploading ? "Uploading..." : "Add"}
           </Button>
         </DialogActions>
       </Dialog>

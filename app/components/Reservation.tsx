@@ -10,6 +10,7 @@ import {
   Paper,
   Alert,
 } from "@mui/material";
+import Image from "next/image";
 
 export default function Reservation() {
   const [formData, setFormData] = useState({
@@ -39,22 +40,11 @@ export default function Reservation() {
     setLoading(true);
     setMessage("");
 
-    const reservationPayload = {
-      name: formData.name,
-      contactNumber: formData.contactNumber,
-      email: formData.email,
-      date: formData.date,
-      time: formData.time,
-      partySize: Number(formData.numberOfGuests),
-    };
-
     try {
       const response = await fetch("/api/reservations", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(reservationPayload),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -83,17 +73,20 @@ export default function Reservation() {
   };
 
   return (
-    <Box component="section" sx={{ py: { xs: 10, md: 16 } }}>
-      <Container maxWidth="sm">
+    <Box
+      component="section"
+      sx={{ py: { xs: 10, md: 16 }, bgcolor: "var(--background)" }}
+    >
+      <Container maxWidth="lg">
         {/* Heading */}
         <Typography
           variant="h3"
           sx={{
-            fontWeight: 300,
-            letterSpacing: "0.15em",
-            color: "var(--primary)",
-            mb: 3,
+            fontWeight: 500,
             textAlign: "center",
+            mb: 2,
+            color: "var(--primary)",
+            letterSpacing: "2px",
           }}
         >
           Reserve Your Table
@@ -101,149 +94,203 @@ export default function Reservation() {
         <Typography
           variant="body1"
           sx={{
-            color: "var(--muted)",
-            mb: 6,
-            lineHeight: 1.8,
             textAlign: "center",
+            mb: 6,
+            color: "var(--muted)",
+            maxWidth: "600px",
+            mx: "auto",
+            lineHeight: 1.8,
           }}
         >
           Experience our curated coffee and culinary delights in a relaxing
           atmosphere. Book a table for your next visit.
         </Typography>
 
-        {/* Form */}
-        <Paper
-          elevation={6}
-          sx={{
-            p: { xs: 3, md: 5 },
-            borderRadius: 3,
-            backgroundColor: "var(--secondary)",
-            mb: 6,
-          }}
-        >
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "1.5rem",
-            }}
-          >
-            <TextField
-              label="Full Name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              required
-              fullWidth
-              variant="outlined"
-              InputLabelProps={{ style: { color: "var(--muted)" } }}
-            />
-            <TextField
-              label="Email Address"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-              fullWidth
-              variant="outlined"
-            />
-            <TextField
-              label="Contact Number"
-              type="tel"
-              name="contactNumber"
-              value={formData.contactNumber}
-              onChange={handleInputChange}
-              required
-              fullWidth
-              variant="outlined"
-            />
-
-            <TextField
-              label="Date"
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleInputChange}
-              required
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              label="Time"
-              type="time"
-              name="time"
-              value={formData.time}
-              onChange={handleInputChange}
-              required
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
-
-            <TextField
-              label="Number of Guests"
-              type="number"
-              name="numberOfGuests"
-              value={formData.numberOfGuests}
-              onChange={handleInputChange}
-              inputProps={{ min: 1 }}
-              required
-              fullWidth
-              variant="outlined"
-            />
-
-            <Button
-              type="submit"
-              disabled={loading}
-              sx={{
-                mt: 2,
-                py: 1.5,
-                px: 4,
-                borderRadius: "999px",
-                backgroundColor: "var(--primary)",
-                color: "var(--foreground)",
-                fontWeight: 600,
-                letterSpacing: 2,
-                "&:hover": {
-                  opacity: 0.9,
-                  backgroundColor: "var(--primary)",
-                },
-              }}
-            >
-              {loading ? "Reserving..." : "Confirm Reservation"}
-            </Button>
-          </form>
-
-          {/* Feedback */}
-          {message && (
-            <Alert
-              severity={message.includes("Failed") ? "error" : "success"}
-              sx={{ mt: 3, borderRadius: 2 }}
-            >
-              {message}
-            </Alert>
-          )}
-        </Paper>
-
-        {/* Image Below Form */}
+        {/* Flex Layout */}
         <Box
           sx={{
-            borderRadius: 3,
-            overflow: "hidden",
-            boxShadow: "0 12px 30px rgba(0,0,0,0.25)",
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 4,
+            alignItems: "stretch",
           }}
         >
-          <img
-            src="https://placehold.co/1000x800/2d2d2d/a1a1a1?text=Make+a+Reservation"
-            alt="Elegant cafe table with a reservation sign"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              transition: "transform 0.5s ease",
+          {/* Form */}
+          <Paper
+            elevation={0}
+            sx={{
+              flex: 1,
+              p: { xs: 3, md: 4 },
+              borderRadius: "var(--radius)",
+              bgcolor: "var(--secondary)",
+              boxShadow: "var(--shadow)",
             }}
-          />
+          >
+            <form
+              onSubmit={handleSubmit}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1.5rem",
+              }}
+            >
+              <TextField
+                label="Full Name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                variant="outlined"
+                InputLabelProps={{ style: { color: "var(--muted)" } }}
+                InputProps={{
+                  style: {
+                    backgroundColor: "var(--secondary)",
+                    color: "var(--foreground)",
+                  },
+                }}
+              />
+              <TextField
+                label="Email Address"
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{ style: { color: "var(--muted)" } }}
+                InputProps={{
+                  style: {
+                    backgroundColor: "var(--secondary)",
+                    color: "var(--foreground)",
+                  },
+                }}
+              />
+              <TextField
+                label="Contact Number"
+                type="tel"
+                name="contactNumber"
+                value={formData.contactNumber}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{ style: { color: "var(--muted)" } }}
+                InputProps={{
+                  style: {
+                    backgroundColor: "var(--secondary)",
+                    color: "var(--foreground)",
+                  },
+                }}
+              />
+              <TextField
+                label="Date"
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: "var(--muted)" },
+                }}
+                InputProps={{
+                  style: {
+                    backgroundColor: "var(--secondary)",
+                    color: "var(--foreground)",
+                  },
+                }}
+              />
+              <TextField
+                label="Time"
+                type="time"
+                name="time"
+                value={formData.time}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: "var(--muted)" },
+                }}
+                InputProps={{
+                  style: {
+                    backgroundColor: "var(--secondary)",
+                    color: "var(--foreground)",
+                  },
+                }}
+              />
+              <TextField
+                label="Number of Guests"
+                type="number"
+                name="numberOfGuests"
+                value={formData.numberOfGuests}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                inputProps={{ min: 1 }}
+                InputLabelProps={{ style: { color: "var(--muted)" } }}
+                InputProps={{
+                  style: {
+                    backgroundColor: "var(--secondary)",
+                    color: "var(--foreground)",
+                  },
+                }}
+              />
+
+              <Button
+                type="submit"
+                disabled={loading}
+                sx={{
+                  mt: 1,
+                  py: 1.4,
+                  borderRadius: "var(--radius)",
+                  fontWeight: 600,
+                  letterSpacing: 1,
+                  backgroundColor: "var(--primary)",
+                  color: "var(--foreground)",
+                  "&:hover": {
+                    opacity: 0.9,
+                    transform: "translateY(-1px)",
+                    backgroundColor: "var(--primary)",
+                  },
+                }}
+              >
+                {loading ? "Reserving..." : "Confirm Reservation"}
+              </Button>
+            </form>
+
+            {message && (
+              <Alert
+                severity={message.includes("Failed") ? "error" : "success"}
+                sx={{ mt: 3, borderRadius: 2 }}
+              >
+                {message}
+              </Alert>
+            )}
+          </Paper>
+
+          {/* Image */}
+          <Box
+            sx={{
+              flex: 1,
+              borderRadius: "var(--radius)",
+              overflow: "hidden",
+              position: "relative",
+              minHeight: { xs: 250, md: "100%" },
+              boxShadow: "var(--shadow)",
+            }}
+          >
+            <Image
+              src="/reservation.jpg"
+              alt="Elegant cafe table with a reservation sign"
+              fill
+              style={{
+                objectFit: "cover",
+                transition: "transform 0.5s ease",
+              }}
+            />
+          </Box>
         </Box>
       </Container>
     </Box>

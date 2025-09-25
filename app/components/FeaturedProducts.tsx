@@ -16,20 +16,20 @@ const featuredItems = [
   {
     name: "Espresso Elegance",
     description: "A rich, full-bodied single-origin espresso.",
-    price: "$4.50",
-    image: "https://placehold.co/600x600/171717/ededed?text=Espresso",
+    price: "₹4.50",
+    image: "expresso.jpg",
   },
   {
     name: "Artisan Croissant",
     description: "Flaky, buttery, and baked to golden perfection.",
-    price: "$3.75",
-    image: "https://placehold.co/600x600/171717/ededed?text=Croissant",
+    price: "₹3.75",
+    image: "criossant.jpg",
   },
   {
     name: "Velvet Latte",
     description: "Our signature latte with a smooth, velvety texture.",
-    price: "$5.25",
-    image: "https://placehold.co/600x600/171717/ededed?text=Latte",
+    price: "₹5.25",
+    image: "latte.jpg",
   },
 ];
 
